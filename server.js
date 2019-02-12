@@ -5,28 +5,33 @@ const FileStore = require('session-file-store')(session);
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const bcrypt =require('bcrypt-nodejs');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
+const Admin = require('./models/admin');
 
-// Mock
-const users = [
-    {id: '2f24vvg', username: 'test@test.com', password: '$2a$10$/q91uTmVX0nyf1XnFFsbpOihLESpxG2u0ABtIDaAjQ1pa0CR0XSo2'}
-  ]
-// Mock
+const dbURL = 'mongodb://localhost/testDB';
 
 passport.use(new LocalStrategy(
     (username, password, done) => {
         console.log('Inside local strategy callback');
-        const user = users[0];
-        // here is where you make a call to the database
-        // to find the user based on their username or email address
-        // for now, we'll just pretend we found that it was users[0] 
-        if(username !== user.username) {
-            return done(null, false, { message: 'Invalid username.\n'});
-        }
-        if (!bcrypt.compareSync(password, user.password)) {
-            return done(null, false, { message: 'Invalid credentials.\n'});
-        }
-        return done(null, user);
+        Admin.findOne({ username: username}, function (err, user) {
+            if (err) { return done(err); }
+            // Return if user not found in database
+            if (!user) {
+              return done(null, false, {
+                message: 'User not found\n'
+              });
+            }
+            // Return if password is wrong
+            if (!user.validPassword(password)) {
+              return done(null, false, {
+                message: 'Password is wrong\n'
+              });
+            }
+            // If credentials are correct, return the user object
+            return done(null, user);
+        });
+        
     }
 ));
 
@@ -42,6 +47,13 @@ passport.deserializeUser((id, done) => {
    const user = users[0].id === id ? users[0] : false; 
    done(null, user);
 });
+
+// Mongoose setup
+mongoose.connect(dbURL);
+mongoose.Promise = global.Promise;
+var db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'MongoDB connection error'))
 
 const port = 3000;
 
@@ -69,25 +81,52 @@ app.get('/', (req, res) => {
     res.send('home page\n')
   });
 
-app.post('/login', (req, res) => {
+app.post('/admin/register', (req, res) => {
+
+    var admin = new Admin();
+
+    admin.username = req.body.username;
+    admin.setPassword(req.body.password);
+
+    admin.save(function(err) {
+        if(err) {
+            res.send('Unable to register');
+        } else {
+            //res.status(200);
+            res.send(`${req.body.username} registered`)
+        }
+    })
+
+});
+
+app.post('/admin/login', (req, res) => {
     console.log('Inside POST /login callback');
     passport.authenticate('local', (err, user, info) => {
         console.log('Inside passport.authenticate() callback');
         console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
         console.log(`req.user: ${JSON.stringify(req.user)}`)
 
-        req.login(user, (err) => {
+        if(err) {
+            console.error(err);
+            return res.send('Authentication failed');
+        }
 
-            if(err) {
-                console.log(err);
-                return res.send('Authentication failed');
-            }
+        if(user) {
+            req.login(user, (err) => {
 
-            console.log('req.login() callback');
-            console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
-            console.log(`req.user: ${JSON.stringify(req.user)}`);
-            return res.send('You were authenticated & logged in!\n');
-        })
+                if(err) {
+                    console.error(err);
+                    return res.send('Authentication failed');
+                }
+
+                console.log('req.login() callback');
+                console.log(`req.session.passport: ${JSON.stringify(req.session.passport)}`);
+                console.log(`req.user: ${JSON.stringify(req.user)}`);
+                return res.send('You were authenticated & logged in!\n');
+        }) } else {
+            console.info(info);
+            res.send(info.message);
+        }
 
     })(req, res);
 })
