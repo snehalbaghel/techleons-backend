@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const mongoose = require('mongoose');
+const cors = require('cors');
 const ObjectId = mongoose.Types.ObjectId;
 const Admin = require('./models/admin');
 
@@ -61,6 +62,7 @@ const app = express();
 
 app.use(bodyParser.urlencoded( { extended: false } ));
 app.use(bodyParser.json());
+app.use(cors());
 // Generates session id and shit
 app.use(session({
     genid: (req) => {

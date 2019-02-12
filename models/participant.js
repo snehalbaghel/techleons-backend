@@ -4,7 +4,7 @@ const TransationModel = require('./transaction');
 const Schema = mongoose.Schema;
 
 const ParticipantSchema = new Schema({
-    name: { type: String, required: true},
+    name: { type: String, required: true, unique: true},
     username:  { type: String, required: true},
     events: { type: Schema.Types.ObjectId, ref: 'Event'},
     transactions: { type: Schema.Types.ObjectId, ref: 'Transation'},
