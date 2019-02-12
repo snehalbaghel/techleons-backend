@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const AttendanceChildSchema = new Schema({
+const ParticipantChildSchema = new Schema({
     participant: {type: Schema.Types.ObjectId, ref: 'Participant'},
     attendance: {type: Boolean, default: false},
 })
@@ -10,7 +10,7 @@ const AttendanceChildSchema = new Schema({
 const EventSchema = new Schema({
     name: {type: string, required: true},
     venue: string,
-    participants: [AttendanceChildSchema],
+    participants: [ParticipantChildSchema],
     // attendees: {type: [Schema.Types.ObjectId], ref: 'Participant',default: undefined},
 })
 

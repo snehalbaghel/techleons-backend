@@ -66,24 +66,24 @@ module.exports.addNewAttendee = function(req, res) {
         });
     }
 
-// module.exports.getParticipants = function(req, res) {
-//     Event
-//         .findById(req.body.eventID)
-//         .exec(function (err, event) {
-//             if(err) {
-//                 console.error(err);
-//             } else {
-//                 event.populate()
-//             }
-//         })
-// //
-//         .populate('participant')
-//         .exec(function(err, event) {
-//             if(err) {
-//                 console.error(err);
-//             } else {
+module.exports.getParticipants = function(req, res) {
+    Event
+        .findById(req.body.eventID)
+        .exec(function (err, event) {
+            if(err) {
+                console.error(err);
+            } else {
+                event.populate()
+            }
+        })
+//
+        // .populate('participant')
+        // .exec(function(err, event) {
+        //     if(err) {
+        //         console.error(err);
+        //     } else {
                 
-//             }
-//         })
+        //     }
+        // })
         
-// }
+}
