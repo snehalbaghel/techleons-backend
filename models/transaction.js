@@ -10,4 +10,4 @@ const TransactionSchema = new Schema({
     team: {type: Schema.Types.ObjectId, ref: 'Team'},
 });
 
-moduls.exports = mongoose.model('Transaction', TransactionSchema);
+module.exports = mongoose.model('Transaction', TransactionSchema);

@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Event = require('../controllers/Event');
+//const mongoose = require('mongoose');
+const Event = require('../models/event');
 const Participant = require('../models/participant');
 
 module.exports.markPresent = function(req, res) {
@@ -29,6 +29,7 @@ module.exports.markPresent = function(req, res) {
         });
 
     }
+
 
 module.exports.addNewAttendee = function(req, res) {
 
@@ -72,11 +73,22 @@ module.exports.getParticipants = function(req, res) {
         .exec(function (err, event) {
             if(err) {
                 console.error(err);
+            } else if(!event) {
+                console.log('invalid');
             } else {
-                event.populate()
+               const participantsModelArray =  event.participants;
+               participantsModelArray
+                    .populate('participant')
+                    .exec(function (err, participants) {
+
+                        if(err) {
+                            console.error(err);
+                        }
+                        res.send(participants);
+                    })
             }
         })
-//
+        //
         // .populate('participant')
         // .exec(function(err, event) {
         //     if(err) {

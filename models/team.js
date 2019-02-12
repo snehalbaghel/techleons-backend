@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const TeamSchema = new Schema({
     name: { type: String, required: true},
     points: {type: Number, default: 0},
-    transactions: { type: Schema.Types.ObjectId, ref: 'Transation'},
+    transactions: { type: Schema.Types.ObjectId, ref: 'Transaction'},
 })
 
 TeamSchema.addTransaction = function(ObjectId) {
@@ -19,3 +19,5 @@ TeamSchema.method.addPoints = function(point) {
 TeamSchema.methods.deductPoints = function(point) {
     this.points -= point;
 }
+
+module.exports = mongoose.model('Team' , TeamSchema);

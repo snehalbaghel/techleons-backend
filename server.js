@@ -10,7 +10,7 @@ const cors = require('cors');
 const ObjectId = mongoose.Types.ObjectId;
 const Admin = require('./models/admin');
 
-const dbURL = 'mongodb://localhost/testDB';
+const dbURL = 'mongodb://localhost/techleons';
 
 passport.use(new LocalStrategy(
     (username, password, done) => {
@@ -50,7 +50,7 @@ passport.deserializeUser((id, done) => {
 });
 
 // Mongoose setup
-mongoose.connect(dbURL);
+mongoose.connect(dbURL, { useNewUrlParser: true });
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 
@@ -78,6 +78,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+const ctrlAtt = require('./controllers/attendance')
+
+app.get('/test', ctrlAtt.getParticipants);
+
 app.get('/', (req, res) => {
     console.log(req.sessionID)
     res.send('home page\n')
@@ -88,6 +92,7 @@ app.post('/admin/register', (req, res) => {
     var admin = new Admin();
 
     admin.username = req.body.username;
+    admin.event = req.body.eid;
     admin.setPassword(req.body.password);
 
     admin.save(function(err) {
