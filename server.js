@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const ObjectId = mongoose.Types.ObjectId;
 const Admin = require('./models/admin');
+const Participant = require('./models/participant');
 
 const dbURL = 'mongodb://localhost/techleons';
 
@@ -154,10 +155,32 @@ app.get('/authrequired', (req, res) => {
     }
 })
 
+app.post('/login', (req, res) => {
+
+    Participant
+        .findOne({username: req.body.username})
+        .exec(function(err, user) {
+            if(err) {
+                console.error(err);
+            }
+            req.session.participantID = user._id;
+            req.session.participantName = user.name;
+            req.session.teamID = user.team;
+            req.session.username = user.username;
+        })
+    
+});
+
+
 app.get('/logout', (req, res)=> {
     if(req.isAuthenticated()){
         req.logout();
         res.send('loggedout');
+    } else {
+        req.session.participantID = null;
+        req.session.participantName = null;
+        req.session.teamID = null;
+        req.session.username = null;
     }
 })
 
