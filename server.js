@@ -39,14 +39,21 @@ passport.use(new LocalStrategy(
 // tell passport how to serialize the user
 passport.serializeUser((user, done) => {
     console.log('Inside serializeUser callback. User id is save to the session file store here')
-    done(null, user.id);
+    done(null, user._id);
 });
 
 passport.deserializeUser((id, done) => {
    console.log('Inside deserializeUser callback')
    console.log(`The user id passport saved in the session file store is: ${id}`)
-   const user = users[0].id === id ? users[0] : false; 
-   done(null, user);
+   Admin
+    .findById(id)
+    .exec((err, user) => {
+        if(err) {
+            console.error();
+        } else {
+            done(null, user);
+        }
+    })
 });
 
 // Mongoose setup
@@ -86,6 +93,7 @@ app.get('/', (req, res) => {
     console.log(req.sessionID)
     res.send('home page\n')
   });
+
 
 app.post('/admin/register', (req, res) => {
 
@@ -142,7 +150,14 @@ app.get('/authrequired', (req, res) => {
     if(req.isAuthenticated()) {
       res.send('you hit the authentication endpoint\n')
     } else {
-      res.redirect('/')
+      res.send('nopee');
+    }
+})
+
+app.get('/logout', (req, res)=> {
+    if(req.isAuthenticated()){
+        req.logout();
+        res.send('loggedout');
     }
 })
 

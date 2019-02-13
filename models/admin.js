@@ -14,7 +14,7 @@ AdminSchema.methods.setPassword = function(pass) {
     this.password = bcrypt.hashSync(pass);
 }
 
-AdminSchema.methods.validconstword = function(pass) {
+AdminSchema.methods.validPassword = function(pass) {
     console.log('inside validate method');
     return bcrypt.compareSync(pass, this.password);
 }
