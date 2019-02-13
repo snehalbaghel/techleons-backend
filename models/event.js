@@ -12,7 +12,7 @@ const AttendanceCSchema = new Schema({
 
 const EventSchema = new Schema({
     name: {type: String, required: true},
-    //venue: string,
+    // venue: string,
     participants: [AttendanceCSchema],
     participationPoints: {type: Number},
     first: {type: Schema.Types.ObjectId, ref: 'Participant'},

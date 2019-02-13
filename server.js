@@ -10,6 +10,9 @@ const cors = require('cors');
 const ObjectId = mongoose.Types.ObjectId;
 const Admin = require('./models/admin');
 const Participant = require('./models/participant');
+const attendanceController = require('./controllers/attendance');
+const pointsController = require('./controllers/points');
+
 
 const dbURL = 'mongodb://localhost/techleons';
 
@@ -86,15 +89,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-const ctrlAtt = require('./controllers/attendance')
-
-app.get('/test', ctrlAtt.getParticipants);
-
 app.get('/', (req, res) => {
     console.log(req.sessionID)
     res.send('home page\n')
   });
-
 
 app.post('/admin/register', (req, res) => {
 
@@ -146,6 +144,14 @@ app.post('/admin/login', (req, res) => {
 
     })(req, res);
 })
+
+app.post('/attendance/mark', attendanceController.markPresent);
+app.post('/attendance/add', attendanceController.addNewAttendee);
+app.get('attendance/getParticipants', attendanceController.getParticipants);
+app.post('/points/first', pointsController.putFirst);
+app.post('/points/second', pointsController.putSecond);
+app.post('/points/third', pointsController.putThird);
+
 
 app.get('/authrequired', (req, res) => {
     if(req.isAuthenticated()) {
